@@ -16,7 +16,7 @@ Critères d'acceptation :
 1. Main levée au-dessus de la tête pendant environ 0,5 s → le décompte 3-2-1 démarre, exactement comme un appui sur l'écran.
 2. Seulement sur l'écran d'accueil de la borne : pas de déclenchement pendant le décompte, la relecture ou l'envoi.
 3. Pas de déclenchement en rafale : délai de quelques secondes après le retour à l'accueil.
-4. Un geste ordinaire (se gratter la tête, passer devant la borne) ne déclenche pas.
+4. Un geste ordinaire (passer devant la borne, bras à hauteur de poitrine) ne déclenche pas. Assoupli le 2026-11-12 à la demande de Théo : lever la main suffit, un geste près de la tête peut donc déclencher.
 5. Un indice visuel discret sur l'accueil (« Levez la main pour lancer la photo ») et un retour quand le geste est reconnu.
 6. L'analyse se fait sur la tablette : aucune image n'est envoyée pour la détection (RGPD).
 7. Le toucher et le capteur PIR continuent de fonctionner.
@@ -33,7 +33,7 @@ Critères d'acceptation :
 
 Piste **A**, choisie par Théo le 2026-11-12.
 
-- Règle (`src/lib/hand-raise.ts`, testée dans `tests/hand-raise.test.cjs`) : une main est levée quand le poignet est au-dessus du nez d'au moins un quart de la largeur des épaules **et** que le coude est au-dessus de l'épaule, repères visibles à plus de 50 %. Le geste doit être tenu 0,5 s ; un seul déclenchement par geste, réarmé en baissant la main. Plusieurs personnes peuvent être dans le cadre (3 au plus).
+- Règle (`src/lib/hand-raise.ts`, testée dans `tests/hand-raise.test.cjs`) : une main est levée quand le poignet passe au-dessus de l'épaule, avec une marge d'un quart de la largeur des épaules ; si la main sort du cadre par le haut, un coude au-dessus de l'épaule suffit. Repères visibles à plus de 50 %. Le geste doit être tenu 0,5 s ; un seul déclenchement par geste, réarmé en baissant la main. Plusieurs personnes peuvent être dans le cadre (3 au plus). Première version (poignet au-dessus du nez ET coude au-dessus de l'épaule) jugée trop exigeante aux essais : il fallait tendre le bras.
 - Modèle : MediaPipe Pose Landmarker lite (`@mediapipe/tasks-vision` 0.10.14), chargé depuis le CDN jsDelivr et Google Storage.
 - Navigateur (`hand-raise-detector.web.tsx`) : analyse directe d'un flux webcam caché, environ 10 images/s.
 - Tablette (`hand-raise-detector.tsx`) : iOS n'accepte qu'une session caméra, donc la WebView n'ouvre pas la caméra. L'app prend une image basse qualité toutes les 250 ms avec la caméra de la borne et l'envoie à une WebView invisible qui fait tourner MediaPipe.

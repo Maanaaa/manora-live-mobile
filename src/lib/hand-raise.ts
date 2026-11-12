@@ -5,7 +5,6 @@
 export type Landmark = { x: number; y: number; visibility?: number };
 export type Pose = Landmark[];
 
-const NOSE = 0;
 const LEFT_SHOULDER = 11;
 const RIGHT_SHOULDER = 12;
 const LEFT_ELBOW = 13;
@@ -18,15 +17,13 @@ const MIN_VISIBILITY = 0.5;
 const visible = (p: Landmark | undefined): p is Landmark => !!p && (p.visibility ?? 1) >= MIN_VISIBILITY;
 
 /**
- * Un bras est levé quand le poignet est nettement au-dessus du nez ET le coude au-dessus de l'épaule.
- * La double condition écarte les gestes ordinaires (se gratter la tête, remettre ses cheveux).
+ * Une main est levée quand le poignet passe au-dessus de l'épaule (marge d'un quart de la largeur
+ * des épaules, pour ignorer les petits mouvements). Si la main sort du cadre par le haut,
+ * un coude au-dessus de l'épaule suffit.
  */
 function armRaised(pose: Pose, shoulder: number, elbow: number, wrist: number): boolean {
-  const nose = pose[NOSE];
   const s = pose[shoulder];
-  const e = pose[elbow];
-  const w = pose[wrist];
-  if (!visible(nose) || !visible(s) || !visible(e) || !visible(w)) return false;
+  if (!visible(s)) return false;
 
   // Marge proportionnelle à la largeur des épaules : fonctionne de près comme de loin.
   const ls = pose[LEFT_SHOULDER];
@@ -34,7 +31,10 @@ function armRaised(pose: Pose, shoulder: number, elbow: number, wrist: number): 
   const shoulderWidth = ls && rs ? Math.abs(ls.x - rs.x) : 0;
   const margin = Math.max(0.03, shoulderWidth * 0.25);
 
-  return w.y < nose.y - margin && e.y < s.y;
+  const w = pose[wrist];
+  if (visible(w)) return w.y < s.y - margin;
+  const e = pose[elbow];
+  return visible(e) && e.y < s.y - margin;
 }
 
 export function isHandRaised(pose: Pose): boolean {
