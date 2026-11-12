@@ -9,4 +9,4 @@ Chaque décision importante est notée ici : contexte, décision, conséquences.
 | [0003](0003-ci-github-actions.md) | CI GitHub Actions reprise de manora-app |
 | [0004](0004-charte-graphique.md) | Charte graphique |
 | [0005](0005-mode-invite.md) | Mode invité |
-| [0006](0006-declenchement-main-levee.md) | Déclenchement de la photo par la main levée (proposé) |
+| [0006](0006-declenchement-main-levee.md) | Déclenchement de la photo par la main levée |
