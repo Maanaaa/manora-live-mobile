@@ -7,21 +7,20 @@ export type Pose = Landmark[];
 
 const LEFT_SHOULDER = 11;
 const RIGHT_SHOULDER = 12;
-const LEFT_ELBOW = 13;
-const RIGHT_ELBOW = 14;
-const LEFT_WRIST = 15;
-const RIGHT_WRIST = 16;
+// Repères de la main dans BlazePose : poignet, auriculaire, index, pouce.
+const LEFT_HAND = [15, 17, 19, 21];
+const RIGHT_HAND = [16, 18, 20, 22];
 
 const MIN_VISIBILITY = 0.5;
 
 const visible = (p: Landmark | undefined): p is Landmark => !!p && (p.visibility ?? 1) >= MIN_VISIBILITY;
 
 /**
- * Une main est levée quand le poignet passe au-dessus de l'épaule (marge d'un quart de la largeur
- * des épaules, pour ignorer les petits mouvements). Si la main sort du cadre par le haut,
- * un coude au-dessus de l'épaule suffit.
+ * Une main est levée quand l'un de ses repères (poignet ou doigts) passe au-dessus de l'épaule,
+ * avec une marge d'un quart de la largeur des épaules pour ignorer les petits mouvements.
+ * Seule la main compte : la position du coude est ignorée.
  */
-function armRaised(pose: Pose, shoulder: number, elbow: number, wrist: number): boolean {
+function handRaised(pose: Pose, shoulder: number, hand: number[]): boolean {
   const s = pose[shoulder];
   if (!visible(s)) return false;
 
@@ -31,16 +30,14 @@ function armRaised(pose: Pose, shoulder: number, elbow: number, wrist: number): 
   const shoulderWidth = ls && rs ? Math.abs(ls.x - rs.x) : 0;
   const margin = Math.max(0.03, shoulderWidth * 0.25);
 
-  const w = pose[wrist];
-  if (visible(w)) return w.y < s.y - margin;
-  const e = pose[elbow];
-  return visible(e) && e.y < s.y - margin;
+  return hand.some((i) => {
+    const p = pose[i];
+    return visible(p) && p.y < s.y - margin;
+  });
 }
 
 export function isHandRaised(pose: Pose): boolean {
-  return (
-    armRaised(pose, LEFT_SHOULDER, LEFT_ELBOW, LEFT_WRIST) || armRaised(pose, RIGHT_SHOULDER, RIGHT_ELBOW, RIGHT_WRIST)
-  );
+  return handRaised(pose, LEFT_SHOULDER, LEFT_HAND) || handRaised(pose, RIGHT_SHOULDER, RIGHT_HAND);
 }
 
 export function anyHandRaised(poses: Pose[]): boolean {

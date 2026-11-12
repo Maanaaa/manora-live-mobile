@@ -39,7 +39,7 @@ test('bras gauche levé : main levée', () => {
   assert.equal(isHandRaised(pose({ 13: { y: 0.32 }, 15: { y: 0.12 } })), true);
 });
 
-test('main levée à hauteur de tête (coude bas) : suffit', () => {
+test('main levée à hauteur de tête, coude bas : suffit (le coude est ignoré)', () => {
   assert.equal(isHandRaised(pose({ 14: { y: 0.5 }, 16: { y: 0.3 } })), true);
 });
 
@@ -51,8 +51,12 @@ test('main juste au niveau de l’épaule : pas de déclenchement (marge)', () =
   assert.equal(isHandRaised(pose({ 16: { y: 0.44 } })), false);
 });
 
-test('main hors du cadre mais coude levé : main levée', () => {
-  assert.equal(isHandRaised(pose({ 14: { y: 0.3 }, 16: { y: -0.05, visibility: 0.1 } })), true);
+test('poignet caché mais index visible au-dessus de l’épaule : main levée', () => {
+  assert.equal(isHandRaised(pose({ 16: { y: 0.2, visibility: 0.1 }, 20: { x: 0.35, y: 0.15, visibility: 0.9 } })), true);
+});
+
+test('coude levé sans main visible : pas de déclenchement', () => {
+  assert.equal(isHandRaised(pose({ 14: { y: 0.3 }, 16: { y: -0.05, visibility: 0.1 } })), false);
 });
 
 test('poignet peu visible et coude bas : ignoré', () => {
