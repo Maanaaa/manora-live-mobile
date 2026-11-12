@@ -13,7 +13,7 @@ import { HandRaiseDetector } from '@/components/kiosk/hand-raise-detector';
 import type { HandRaiseStatus } from '@/components/kiosk/hand-raise-detector.types';
 import { QrCard } from '@/components/kiosk/qr-card';
 import { StatusChip } from '@/components/kiosk/status-chip';
-import { isApiConfigured, uploadBoothPhoto, type UploadedPhoto } from '@/lib/api';
+import { fetchBoothEvent, isApiConfigured, uploadBoothPhoto, type UploadedPhoto } from '@/lib/api';
 import { getBoothKey } from '@/lib/settings';
 import { colors, fonts, radius, shadow } from '@/lib/theme';
 import { useBoothEvents } from '@/lib/use-booth-events';
@@ -36,6 +36,7 @@ export default function KioskScreen() {
   const [cameraReady, setCameraReady] = useState(false);
 
   const [boothKey, setBoothKeyState] = useState<string | null>(null);
+  const [galleryUrl, setGalleryUrl] = useState(GALLERY_URL);
   const [phase, setPhase] = useState<Phase>('idle');
   const [count, setCount] = useState(COUNTDOWN_SECONDS);
   const [photoUri, setPhotoUri] = useState<string | null>(null);
@@ -57,6 +58,22 @@ export default function KioskScreen() {
   useEffect(() => {
     getBoothKey().then(setBoothKeyState);
   }, []);
+
+  // QR de la galerie en direct : l'API donne l'adresse de la galerie de l'événement en cours.
+  useEffect(() => {
+    if (!boothKey || !isApiConfigured) return;
+    let cancelled = false;
+    const load = () =>
+      fetchBoothEvent(boothKey)
+        .then((event) => !cancelled && setGalleryUrl(event.galleryUrl))
+        .catch(() => {});
+    load();
+    const timer = setInterval(load, 5 * 60 * 1000); // si l'organisateur change d'événement
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, [boothKey]);
 
   const reset = useCallback(() => {
     setPhase('idle');
@@ -208,6 +225,7 @@ export default function KioskScreen() {
             handReady={handStatus === 'ready'}
             cameraReady={cameraReady && !!permission?.granted}
             uploaded={uploaded}
+            galleryUrl={galleryUrl}
             errorMessage={errorMessage}
             onStart={() => start()}
             onRetake={() => {
@@ -231,6 +249,7 @@ function Aside(props: {
   handReady: boolean;
   cameraReady: boolean;
   uploaded: UploadedPhoto | null;
+  galleryUrl: string;
   errorMessage: string;
   onStart: () => void;
   onRetake: () => void;
@@ -328,12 +347,12 @@ function Aside(props: {
           onPress={props.onStart}
         />
       </View>
-      {GALLERY_URL ? (
+      {props.galleryUrl ? (
         <QrCard
-          value={GALLERY_URL}
+          value={props.galleryUrl}
           title="La galerie en direct"
-          caption="Retrouvez toutes les photos et partagez les vôtres."
-          size={110}
+          caption="Scannez pour voir toutes les photos de la soirée et ajouter les vôtres."
+          size={130}
         />
       ) : null}
     </>
