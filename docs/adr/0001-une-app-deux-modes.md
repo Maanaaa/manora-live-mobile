@@ -26,5 +26,5 @@ Sans `EXPO_PUBLIC_API_URL`, la borne fonctionne en mode démo : elle prend les p
 ## Conséquences
 
 - Un seul build à installer, sur la tablette comme sur les téléphones.
-- Les routes sont séparées : `src/app/kiosk.tsx` pour la borne, `src/app/(guest)/` pour l'invité.
+- Les routes sont séparées : `src/app/kiosk.tsx` pour la borne, `src/app/join.tsx` (rejoindre un événement) et `src/app/(guest)/` (onglets et fiche photo) pour l'invité. Détails dans l'ADR 0005.
 - Le Raspberry Pi reste sans écran, comme l'exige le sujet : l'affichage de la borne est sur la tablette.
