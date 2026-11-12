@@ -1,25 +1,31 @@
-import { Redirect } from 'expo-router';
+import { Redirect, type Href } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 
-import { getMode, type AppMode } from '@/lib/settings';
+import { getGuestSession, getMode } from '@/lib/settings';
 import { colors } from '@/lib/theme';
 
-/** Aiguillage au lancement : une tablette réglée en mode borne démarre directement sur la borne. */
+/**
+ * Aiguillage au lancement : une tablette réglée en mode borne démarre directement sur la borne ;
+ * sinon l'invité retrouve sa galerie, ou l'écran pour rejoindre un événement.
+ */
 export default function Index() {
-  const [mode, setMode] = useState<AppMode | null>(null);
+  const [target, setTarget] = useState<Href | null>(null);
 
   useEffect(() => {
-    getMode().then(setMode);
+    (async () => {
+      if ((await getMode()) === 'kiosk') return setTarget('/kiosk');
+      setTarget((await getGuestSession()) ? '/gallery' : '/join');
+    })();
   }, []);
 
-  if (!mode) {
+  if (!target) {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.cream2 }}>
-        <ActivityIndicator color={colors.terracotta} />
+        <ActivityIndicator color={colors.terracotta} accessibilityLabel="Chargement" />
       </View>
     );
   }
 
-  return <Redirect href={mode === 'kiosk' ? '/kiosk' : '/guest'} />;
+  return <Redirect href={target} />;
 }

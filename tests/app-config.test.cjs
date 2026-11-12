@@ -16,8 +16,15 @@ test('la caméra a un message de permission en français', () => {
   assert.match(camera[1].cameraPermission, /caméra/);
 });
 
-test('les plugins natifs de la borne sont déclarés', () => {
-  for (const name of ['expo-router', 'expo-camera', 'expo-secure-store', 'expo-screen-orientation']) {
+test('les plugins natifs de la borne et du mode invité sont déclarés', () => {
+  for (const name of [
+    'expo-router',
+    'expo-camera',
+    'expo-secure-store',
+    'expo-screen-orientation',
+    'expo-image-picker',
+    'expo-media-library',
+  ]) {
     assert.ok(pluginNames.includes(name), `plugin ${name} manquant`);
   }
 });
@@ -39,4 +46,24 @@ test("la clé d'API de la borne passe par expo-secure-store", () => {
   const settings = read('src/lib/settings.ts');
   assert.match(settings, /expo-secure-store/);
   assert.match(settings, /SecureStore\.setItemAsync/);
+});
+
+test('les permissions photos du mode invité sont en français', () => {
+  const picker = app.plugins.find((p) => Array.isArray(p) && p[0] === 'expo-image-picker');
+  const library = app.plugins.find((p) => Array.isArray(p) && p[0] === 'expo-media-library');
+  assert.match(picker[1].cameraPermission, /caméra/);
+  assert.match(picker[1].photosPermission, /photos/);
+  assert.equal(picker[1].microphonePermission, false);
+  assert.match(library[1].savePhotosPermission, /enregistre/);
+});
+
+test("le jeton invité est stocké avec expo-secure-store", () => {
+  const settings = read('src/lib/settings.ts');
+  assert.match(settings, /guestSession: 'manora\.guestSession'/);
+  assert.match(settings, /setGuestSession/);
+});
+
+test('les liens manoralive://join ouvrent l’écran pour rejoindre un événement', () => {
+  assert.equal(app.scheme, 'manoralive');
+  assert.ok(fs.existsSync(path.join(root, 'src/app/join.tsx')));
 });
