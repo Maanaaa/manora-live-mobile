@@ -1,6 +1,4 @@
-import { File, Paths } from 'expo-file-system';
 import { Image } from 'expo-image';
-import * as MediaLibrary from 'expo-media-library';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
@@ -10,30 +8,11 @@ import { Button } from '@/components/button';
 import { Icon } from '@/components/icon';
 import { ApiError, deletePhoto, type Photo } from '@/lib/api';
 import { confirm } from '@/lib/confirm';
+import { saveToPhone } from '@/lib/save-photo';
 import { useGuest } from '@/lib/guest-context';
 import { colors, fonts } from '@/lib/theme';
 
 type Busy = 'save' | 'delete' | null;
-
-/** Télécharge la photo dans le cache de l'app puis l'ajoute à la galerie du téléphone. */
-async function saveToPhone(photo: Photo) {
-  if (Platform.OS === 'web') {
-    globalThis.open?.(photo.url, '_blank');
-    return;
-  }
-  const permission = await MediaLibrary.requestPermissionsAsync(true, ['photo']);
-  if (!permission.granted) {
-    throw new Error('Autorisez l’accès à vos photos dans les réglages du téléphone pour enregistrer celle-ci.');
-  }
-  let file: File;
-  try {
-    const target = new File(Paths.cache, `manora-${photo.id.replace(/[^\w-]/g, '')}.jpg`);
-    file = await File.downloadFileAsync(photo.url, target, { idempotent: true });
-  } catch {
-    throw new Error('Le téléchargement a échoué. Vérifiez votre connexion et réessayez.');
-  }
-  await MediaLibrary.Asset.create(file.uri);
-}
 
 function formatTime(iso: string) {
   const date = new Date(iso);
