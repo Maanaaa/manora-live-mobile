@@ -281,7 +281,7 @@ function Aside(props: {
         <Text style={styles.title}>Merci !</Text>
         {props.uploaded ? (
           <QrCard
-            value={props.uploaded.url}
+            value={props.uploaded.pageUrl ?? props.uploaded.url}
             title="Récupérez votre photo"
             caption="Scannez avec l'appareil photo de votre téléphone."
             size={170}
