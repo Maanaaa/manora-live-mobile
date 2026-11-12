@@ -48,4 +48,4 @@ src/lib/         API, réglages (expo-secure-store), temps réel, charte
 | Appel | Usage |
 | --- | --- |
 | `POST /photos` (multipart `photo`, `source=booth`, `Authorization: Bearer <clé>`) | envoi d'une photo de la borne, réponse `{ id, url }` |
-| WebSocket `/ws?channel=booth&token=<clé>` | événements `booth.countdown`, `booth.sleep`, `booth.wake` |
+| WebSocket `/ws?token=<clé>` | événements `booth.countdown`, `booth.sleep`, `booth.wake` |

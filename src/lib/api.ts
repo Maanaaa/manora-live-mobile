@@ -56,5 +56,5 @@ export async function uploadBoothPhoto(uri: string, boothKey: string): Promise<U
 /** URL du canal temps réel (WebSocket) pour la borne. */
 export function boothSocketUrl(boothKey: string) {
   if (!isApiConfigured) return null;
-  return `${API_URL.replace(/^http/, 'ws')}/ws?channel=booth&token=${encodeURIComponent(boothKey)}`;
+  return `${API_URL.replace(/^http/, 'ws')}/ws?token=${encodeURIComponent(boothKey)}`;
 }
