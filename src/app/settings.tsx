@@ -24,7 +24,7 @@ export default function SettingsScreen() {
     await setBoothKey(key);
     await setMode(kiosk ? 'kiosk' : 'guest');
     if (router.canDismiss()) router.dismissAll();
-    router.replace(kiosk ? '/kiosk' : '/guest');
+    router.replace(kiosk ? '/kiosk' : '/');
   };
 
   if (!loaded) return null;
