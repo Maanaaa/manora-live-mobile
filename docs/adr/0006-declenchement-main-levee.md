@@ -33,7 +33,7 @@ Critères d'acceptation :
 
 Piste **A**, choisie par Théo le 2026-11-12.
 
-- Règle (`src/lib/hand-raise.ts`, testée dans `tests/hand-raise.test.cjs`) : une main est levée quand le poignet passe au-dessus de l'épaule, avec une marge d'un quart de la largeur des épaules ; si la main sort du cadre par le haut, un coude au-dessus de l'épaule suffit. Repères visibles à plus de 50 %. Le geste doit être tenu 0,5 s ; un seul déclenchement par geste, réarmé en baissant la main. Plusieurs personnes peuvent être dans le cadre (3 au plus). Première version (poignet au-dessus du nez ET coude au-dessus de l'épaule) jugée trop exigeante aux essais : il fallait tendre le bras.
+- Règle (`src/lib/hand-raise.ts`, testée dans `tests/hand-raise.test.cjs`) : seule la main compte. Elle est levée quand l'un de ses repères (poignet, index, auriculaire ou pouce) passe au-dessus de l'épaule, avec une marge d'un quart de la largeur des épaules ; le coude est ignoré. Repères visibles à plus de 50 %. Le geste doit être tenu 0,5 s ; un seul déclenchement par geste, réarmé en baissant la main. Plusieurs personnes peuvent être dans le cadre (3 au plus). Première version (poignet au-dessus du nez ET coude au-dessus de l'épaule) jugée trop exigeante aux essais : il fallait tendre le bras.
 - Modèle : MediaPipe Pose Landmarker lite (`@mediapipe/tasks-vision` 0.10.14), chargé depuis le CDN jsDelivr et Google Storage.
 - Navigateur (`hand-raise-detector.web.tsx`) : analyse directe d'un flux webcam caché, environ 10 images/s.
 - Tablette (`hand-raise-detector.tsx`) : iOS n'accepte qu'une session caméra, donc la WebView n'ouvre pas la caméra. L'app prend une image basse qualité toutes les 250 ms avec la caméra de la borne et l'envoie à une WebView invisible qui fait tourner MediaPipe.
