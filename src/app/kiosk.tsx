@@ -9,6 +9,8 @@ import { ActivityIndicator, Animated, Platform, Pressable, StyleSheet, Text, Vie
 
 import { Button } from '@/components/button';
 import { CountdownOverlay } from '@/components/kiosk/countdown-overlay';
+import { HandRaiseDetector } from '@/components/kiosk/hand-raise-detector';
+import type { HandRaiseStatus } from '@/components/kiosk/hand-raise-detector.types';
 import { QrCard } from '@/components/kiosk/qr-card';
 import { StatusChip } from '@/components/kiosk/status-chip';
 import { isApiConfigured, uploadBoothPhoto, type UploadedPhoto } from '@/lib/api';
@@ -17,6 +19,7 @@ import { colors, fonts, radius, shadow } from '@/lib/theme';
 import { useBoothEvents } from '@/lib/use-booth-events';
 
 type Phase = 'idle' | 'countdown' | 'review' | 'sending' | 'done' | 'error';
+type Trigger = 'touch' | 'hand' | 'sensor';
 
 const COUNTDOWN_SECONDS = 3;
 // Délais avant retour automatique à l'accueil, pour ne pas bloquer la borne.
@@ -39,6 +42,8 @@ export default function KioskScreen() {
   const [uploaded, setUploaded] = useState<UploadedPhoto | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [flash] = useState(() => new Animated.Value(0));
+  const [handStatus, setHandStatus] = useState<HandRaiseStatus>('loading');
+  const [trigger, setTrigger] = useState<Trigger>('touch');
 
   // Borne en paysage, plein écran.
   useEffect(() => {
@@ -61,11 +66,15 @@ export default function KioskScreen() {
     setCount(COUNTDOWN_SECONDS);
   }, []);
 
-  const start = useCallback(() => {
-    if (!cameraReady) return;
-    setCount(COUNTDOWN_SECONDS);
-    setPhase('countdown');
-  }, [cameraReady]);
+  const start = useCallback(
+    (by: Trigger = 'touch') => {
+      if (!cameraReady) return;
+      setTrigger(by);
+      setCount(COUNTDOWN_SECONDS);
+      setPhase('countdown');
+    },
+    [cameraReady],
+  );
 
   // Événements temps réel : la règle « présence détectée » (capteur PIR) lance la photo.
   const phaseRef = useRef(phase);
@@ -73,7 +82,7 @@ export default function KioskScreen() {
     phaseRef.current = phase;
   }, [phase]);
   const link = useBoothEvents(boothKey, (event) => {
-    if (event.type === 'booth.countdown' && phaseRef.current === 'idle') start();
+    if (event.type === 'booth.countdown' && phaseRef.current === 'idle') start('sensor');
   });
 
   const capture = useCallback(async () => {
@@ -169,10 +178,22 @@ export default function KioskScreen() {
           {phase === 'countdown' && count > 0 ? <CountdownOverlay value={count} /> : null}
           <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.flash, { opacity: flash }]} />
 
+          {permission?.granted ? (
+            <HandRaiseDetector
+              enabled={phase === 'idle'}
+              cameraRef={cameraRef}
+              cameraReady={cameraReady}
+              onRaise={() => {
+                if (phaseRef.current === 'idle') start('hand');
+              }}
+              onStatus={setHandStatus}
+            />
+          ) : null}
+
           {phase === 'idle' && permission?.granted ? (
             <Pressable
               style={StyleSheet.absoluteFill}
-              onPress={start}
+              onPress={() => start()}
               accessibilityRole="button"
               accessibilityLabel="Toucher l'écran pour prendre une photo"
             />
@@ -183,10 +204,12 @@ export default function KioskScreen() {
           <Aside
             phase={phase}
             count={count}
+            trigger={trigger}
+            handReady={handStatus === 'ready'}
             cameraReady={cameraReady && !!permission?.granted}
             uploaded={uploaded}
             errorMessage={errorMessage}
-            onStart={start}
+            onStart={() => start()}
             onRetake={() => {
               setPhotoUri(null);
               start();
@@ -204,6 +227,8 @@ export default function KioskScreen() {
 function Aside(props: {
   phase: Phase;
   count: number;
+  trigger: Trigger;
+  handReady: boolean;
   cameraReady: boolean;
   uploaded: UploadedPhoto | null;
   errorMessage: string;
@@ -218,7 +243,7 @@ function Aside(props: {
   if (phase === 'countdown') {
     return (
       <>
-        <Text style={styles.eyebrow}>SOURIEZ</Text>
+        <Text style={styles.eyebrow}>{props.trigger === 'hand' ? 'MAIN LEVÉE, C’EST PARTI' : 'SOURIEZ'}</Text>
         <Text style={styles.title}>Regardez l’objectif…</Text>
         <Text style={styles.lead}>Photo dans {props.count} seconde{props.count > 1 ? 's' : ''}.</Text>
       </>
@@ -290,7 +315,11 @@ function Aside(props: {
     <>
       <Text style={styles.eyebrow}>PHOTOBOOTH</Text>
       <Text style={styles.title}>Prenez la pose !</Text>
-      <Text style={styles.lead}>Touchez l’écran : 3 secondes pour vous placer, puis souriez.</Text>
+      <Text style={styles.lead}>
+        {props.handReady
+          ? 'Levez la main ou touchez l’écran : 3 secondes pour vous placer, puis souriez.'
+          : 'Touchez l’écran : 3 secondes pour vous placer, puis souriez.'}
+      </Text>
       <View style={styles.actions}>
         <Button
           label={props.cameraReady ? 'Prendre ma photo' : 'Démarrage de la caméra…'}

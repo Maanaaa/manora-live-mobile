@@ -1,6 +1,6 @@
 # ADR 0006 — Déclenchement de la photo par la main levée
 
-- Statut : proposé (algorithme à choisir)
+- Statut : accepté (piste A)
 - Date : 2026-11-12
 
 ## Contexte
@@ -29,12 +29,19 @@ Critères d'acceptation :
 | B. VisionCamera + plugin de pose (MediaPipe ou ML Kit) | Analyse native image par image (frame processors) | Le plus fluide et le plus économe | Exige un development build : incompatible avec Expo Go |
 | C. Détection de mouvement maison | Captures basse définition toutes les 300 ms, différence d'images dans la zone haute du cadre | Aucune dépendance | Ne distingue pas une main levée d'un autre mouvement ; décodage JPEG lourd en JS |
 
-## Recommandation
+## Décision
 
-Piste **A** tant que l'app tourne dans Expo Go. La règle « poignet au-dessus du nez pendant 0,5 s » couvre les critères 1 et 4 simplement. Si un development build est fait plus tard, la piste B prend le relais avec la même règle.
+Piste **A**, choisie par Théo le 2026-11-12.
+
+- Règle (`src/lib/hand-raise.ts`, testée dans `tests/hand-raise.test.cjs`) : une main est levée quand le poignet est au-dessus du nez d'au moins un quart de la largeur des épaules **et** que le coude est au-dessus de l'épaule, repères visibles à plus de 50 %. Le geste doit être tenu 0,5 s ; un seul déclenchement par geste, réarmé en baissant la main. Plusieurs personnes peuvent être dans le cadre (3 au plus).
+- Modèle : MediaPipe Pose Landmarker lite (`@mediapipe/tasks-vision` 0.10.14), chargé depuis le CDN jsDelivr et Google Storage.
+- Navigateur (`hand-raise-detector.web.tsx`) : analyse directe d'un flux webcam caché, environ 10 images/s.
+- Tablette (`hand-raise-detector.tsx`) : iOS n'accepte qu'une session caméra, donc la WebView n'ouvre pas la caméra. L'app prend une image basse qualité toutes les 250 ms avec la caméra de la borne et l'envoie à une WebView invisible qui fait tourner MediaPipe.
+- L'analyse ne tourne que sur l'accueil, 3 s après y être revenu. Le décompte affiche « Main levée, c'est parti » quand le geste a lancé la photo, et l'accueil invite à lever la main dès que le modèle est prêt.
 
 ## Conséquences
 
-- Nouvelle dépendance `react-native-webview` et modèle MediaPipe à embarquer dans l'app.
-- L'aperçu caméra de la borne est à reprendre dans la WebView ; la capture de la photo doit rester de bonne qualité.
-- La décision passera au statut « accepté » une fois la piste choisie et testée sur la tablette.
+- Nouvelle dépendance `react-native-webview` (incluse dans Expo Go).
+- Le modèle est téléchargé au lancement : il faut Internet sur la tablette. L'embarquer dans l'app supprimerait cette dépendance.
+- Version tablette non testée sur appareil : la fréquence des captures (250 ms) est à ajuster selon la fluidité de l'aperçu.
+- Si un development build est fait plus tard, la piste B peut remplacer le détecteur tablette en gardant la même règle.
