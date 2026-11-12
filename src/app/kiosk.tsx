@@ -91,7 +91,7 @@ export default function KioskScreen() {
       Animated.timing(flash, { toValue: 0, duration: 420, useNativeDriver: true }),
     ]).start();
     try {
-      const picture = await cameraRef.current?.takePictureAsync({ quality: 0.85, shutterSound: false });
+      const picture = await cameraRef.current?.takePictureAsync({ quality: 0.85, imageType: 'jpg', shutterSound: false });
       if (!picture?.uri) throw new Error('no picture');
       setPhotoUri(picture.uri);
       setPhase('review');
