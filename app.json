@@ -39,12 +39,31 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "La borne utilise la caméra pour prendre les photos des invités.",
+          "cameraPermission": "Manora Live utilise la caméra pour prendre des photos : à la borne, ou pour partager les vôtres dans la galerie.",
           "recordAudioAndroid": false
         }
       ],
       "expo-secure-store",
-      "expo-screen-orientation"
+      "expo-screen-orientation",
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Manora Live utilise la caméra pour prendre des photos : à la borne, ou pour partager les vôtres dans la galerie.",
+          "photosPermission": "Manora Live accède à vos photos pour que vous puissiez en partager dans la galerie de l’événement.",
+          "microphonePermission": false
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Manora Live accède à vos photos pour que vous puissiez en partager dans la galerie de l’événement.",
+          "savePhotosPermission": "Manora Live enregistre les photos de l’événement dans votre galerie.",
+          "isAccessMediaLocationEnabled": false,
+          "granularPermissions": [
+            "photo"
+          ]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
