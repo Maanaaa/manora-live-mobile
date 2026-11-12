@@ -10,8 +10,10 @@ export const isApiConfigured = API_URL.length > 0;
 
 export type UploadedPhoto = {
   id: string;
-  /** Page publique de la photo, encodée dans le QR affiché sur la borne. */
+  /** Image JPEG publique. */
   url: string;
+  /** Page publique de récupération (télécharger, enregistrer), encodée dans le QR de la borne. */
+  pageUrl?: string;
 };
 
 /** Photo de la galerie (contrat ADR 0002). */
@@ -19,6 +21,7 @@ export type Photo = {
   id: string;
   url: string;
   thumbUrl: string;
+  pageUrl?: string;
   source: 'booth' | 'guest';
   authorName: string | null;
   mine: boolean;
@@ -103,7 +106,7 @@ async function uploadPhoto(uri: string, token: string, source: Photo['source']):
     timeout: 30000,
   });
   if (!data?.id || !data.url) throw new ApiError('Réponse inattendue du serveur.');
-  return { id: data.id, url: data.url };
+  return { id: data.id, url: data.url, ...(data.pageUrl ? { pageUrl: data.pageUrl } : {}) };
 }
 
 /** POST /photos : envoie la photo prise par la borne (clé d'API de la tablette). */
