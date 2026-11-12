@@ -154,6 +154,13 @@ export function socketUrl(token: string) {
 }
 
 /** URL du canal temps réel (WebSocket) pour la borne. */
+/** Événement en cours et adresse de sa galerie en direct (QR de l'accueil de la borne). */
+export type BoothEvent = { id: string; name: string; code: string; galleryUrl: string };
+
+export function fetchBoothEvent(boothKey: string) {
+  return request<BoothEvent>('/booth/event', { token: boothKey });
+}
+
 export function boothSocketUrl(boothKey: string) {
   return socketUrl(boothKey);
 }

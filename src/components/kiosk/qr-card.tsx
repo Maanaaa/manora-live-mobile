@@ -7,7 +7,19 @@ export function QrCard({ value, title, caption, size = 200 }: { value: string; t
   return (
     <View style={styles.card} accessible accessibilityLabel={`${title}. QR code à scanner.`}>
       <View style={styles.qr}>
-        <QRCode value={value} size={size} color={colors.ink} backgroundColor={colors.white} />
+        {/* Logo Manora au centre : correction d'erreur maximale (H, ~30 %) pour rester lisible. */}
+        <QRCode
+          value={value}
+          size={size}
+          color={colors.ink}
+          backgroundColor={colors.white}
+          ecl="H"
+          logo={require('@/assets/images/manora-icon.png')}
+          logoSize={Math.round(size * 0.22)}
+          logoMargin={3}
+          logoBorderRadius={8}
+          logoBackgroundColor={colors.white}
+        />
       </View>
       <View style={styles.copy}>
         <Text style={styles.title}>{title}</Text>
