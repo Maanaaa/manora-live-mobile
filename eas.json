@@ -9,16 +9,16 @@
       "android": {
         "buildType": "apk"
       },
-      "env": {
-        "EXPO_PUBLIC_API_URL": "https://api.live.manora-photo.fr"
-      }
-    },
-    "development": {
-      "extends": "preview",
-      "developmentClient": true
+      "environment": "preview",
+      "channel": "dev"
     },
     "production": {
-      "extends": "preview",
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "environment": "production",
+      "channel": "prod",
       "autoIncrement": true
     }
   }
