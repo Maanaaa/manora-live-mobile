@@ -154,6 +154,11 @@ export function socketUrl(token: string) {
 }
 
 /** URL du canal temps réel (WebSocket) pour la borne. */
+/** Enregistre le jeton Expo Push de l'appareil pour recevoir les notifications. */
+export function savePushToken(pushToken: string, authToken: string) {
+  return request<void>('/push-tokens', { token: authToken, method: 'POST', body: { token: pushToken } });
+}
+
 /** Événement en cours et adresse de sa galerie en direct (QR de l'accueil de la borne). */
 export type BoothEvent = { id: string; name: string; code: string; galleryUrl: string };
 
