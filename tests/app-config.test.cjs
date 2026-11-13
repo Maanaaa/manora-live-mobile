@@ -76,3 +76,10 @@ test('mises à jour over the air : jamais appliquées d’office (bouton « Inst
   assert.match(banner, /fetchUpdateAsync/);
   assert.match(read('src/app/_layout.tsx'), /<UpdateBanner \/>/);
 });
+
+test('notifications push : plugin déclaré, inscription de l’invité, ouverture au toucher', () => {
+  assert.ok(pluginNames.includes('expo-notifications'), 'plugin expo-notifications manquant');
+  assert.match(read('src/lib/push.ts'), /getExpoPushTokenAsync/);
+  assert.match(read('src/app/(guest)/_layout.tsx'), /registerForPush/);
+  assert.match(read('src/app/_layout.tsx'), /useNotificationRouting\(\)/);
+});
