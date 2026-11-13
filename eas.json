@@ -1,0 +1,25 @@
+{
+  "cli": {
+    "version": ">= 27.4.1",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://api.live.manora-photo.fr"
+      }
+    },
+    "development": {
+      "extends": "preview",
+      "developmentClient": true
+    },
+    "production": {
+      "extends": "preview",
+      "autoIncrement": true
+    }
+  }
+}
