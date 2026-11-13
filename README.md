@@ -68,3 +68,18 @@ src/lib/               API, réglages (expo-secure-store), temps réel, galerie,
 | `POST /photos` (multipart `photo`, `source=guest`) | partage d'une photo par un invité |
 | `DELETE /photos/:id` | suppression de sa photo |
 | WebSocket `/ws?token=<jeton invité>` | événements `photo.created`, `photo.deleted` |
+
+## Compiler et mettre à jour (EAS)
+
+Projet Expo : `@mana_uca/manora-live`.
+
+| Commande | Effet |
+| --- | --- |
+| `npm run build:apk` | APK de production, canal de mises à jour **prod** (tablette de la borne) |
+| `npm run build:preview` | APK de test, canal **dev** |
+| `npm run update:prod -- --message "…"` | Mise à jour over the air des APK de production |
+| `npm run update:dev -- --message "…"` | Mise à jour over the air des APK de test |
+
+Les mises à jour ne sont jamais appliquées d'office : l'app vérifie au lancement, au retour au premier plan et toutes les 30 min, puis affiche un bandeau « Une mise à jour est disponible » avec **Installer** et **Plus tard** (`src/components/update-banner.tsx`, `checkAutomatically: NEVER`).
+
+Une mise à jour over the air ne remplace que le JavaScript et les images : un changement de module natif ou de `version` dans `app.json` demande un nouvel APK (`runtimeVersion` suit la version de l'app). L'adresse de l'API (`EXPO_PUBLIC_API_URL`) est une variable d'environnement EAS.

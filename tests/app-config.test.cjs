@@ -67,3 +67,19 @@ test('les liens manoralive://join ouvrent l’écran pour rejoindre un événeme
   assert.equal(app.scheme, 'manoralive');
   assert.ok(fs.existsSync(path.join(root, 'src/app/join.tsx')));
 });
+
+test('mises à jour over the air : jamais appliquées d’office (bouton « Installer »)', () => {
+  assert.equal(app.updates.checkAutomatically, 'NEVER');
+  assert.match(app.updates.url, /^https:\/\/u\.expo\.dev\//);
+  const banner = read('src/components/update-banner.tsx');
+  assert.match(banner, /checkForUpdateAsync/);
+  assert.match(banner, /fetchUpdateAsync/);
+  assert.match(read('src/app/_layout.tsx'), /<UpdateBanner \/>/);
+});
+
+test('notifications push : plugin déclaré, inscription de l’invité, ouverture au toucher', () => {
+  assert.ok(pluginNames.includes('expo-notifications'), 'plugin expo-notifications manquant');
+  assert.match(read('src/lib/push.ts'), /getExpoPushTokenAsync/);
+  assert.match(read('src/app/(guest)/_layout.tsx'), /registerForPush/);
+  assert.match(read('src/app/_layout.tsx'), /useNotificationRouting\(\)/);
+});

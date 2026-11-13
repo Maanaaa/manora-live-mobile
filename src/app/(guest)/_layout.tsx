@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 
 import { GuestProvider } from '@/lib/guest-context';
+import { registerForPush } from '@/lib/push';
 import { getGuestSession, type GuestSession } from '@/lib/settings';
 import { colors } from '@/lib/theme';
 
@@ -13,6 +14,12 @@ export default function GuestLayout() {
   useEffect(() => {
     getGuestSession().then(setSession);
   }, []);
+
+  // Notifications « nouvelles photos dans la galerie » : inscription dès que l'invité a rejoint un événement.
+  const authToken = session?.token;
+  useEffect(() => {
+    if (authToken) registerForPush(authToken).catch(() => {});
+  }, [authToken]);
 
   if (session === undefined) {
     return (

@@ -10,11 +10,14 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 
+import { UpdateBanner } from '@/components/update-banner';
+import { useNotificationRouting } from '@/lib/push';
 import { colors } from '@/lib/theme';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  useNotificationRouting();
   const [loaded, error] = useFonts({
     PlusJakartaSans_400Regular,
     PlusJakartaSans_500Medium,
@@ -30,18 +33,21 @@ export default function RootLayout() {
   if (!loaded && !error) return null;
 
   return (
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.cream2 } }}>
-      <Stack.Screen name="kiosk" options={{ gestureEnabled: false, animation: 'fade' }} />
-      <Stack.Screen
-        name="settings"
-        options={{
-          headerShown: true,
-          title: 'Réglages',
-          presentation: 'modal',
-          headerStyle: { backgroundColor: colors.cream2 },
-          headerTintColor: colors.ink,
-        }}
-      />
-    </Stack>
+    <>
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.cream2 } }}>
+        <Stack.Screen name="kiosk" options={{ gestureEnabled: false, animation: 'fade' }} />
+        <Stack.Screen
+          name="settings"
+          options={{
+            headerShown: true,
+            title: 'Réglages',
+            presentation: 'modal',
+            headerStyle: { backgroundColor: colors.cream2 },
+            headerTintColor: colors.ink,
+          }}
+        />
+      </Stack>
+      <UpdateBanner />
+    </>
   );
 }
