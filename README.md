@@ -80,4 +80,6 @@ Projet Expo : `@mana_uca/manora-live`.
 | `npm run update:prod -- --message "…"` | Mise à jour over the air des APK de production |
 | `npm run update:dev -- --message "…"` | Mise à jour over the air des APK de test |
 
+Les mises à jour ne sont jamais appliquées d'office : l'app vérifie au lancement, au retour au premier plan et toutes les 30 min, puis affiche un bandeau « Une mise à jour est disponible » avec **Installer** et **Plus tard** (`src/components/update-banner.tsx`, `checkAutomatically: NEVER`).
+
 Une mise à jour over the air ne remplace que le JavaScript et les images : un changement de module natif ou de `version` dans `app.json` demande un nouvel APK (`runtimeVersion` suit la version de l'app). L'adresse de l'API (`EXPO_PUBLIC_API_URL`) est une variable d'environnement EAS.

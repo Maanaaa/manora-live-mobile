@@ -5,12 +5,13 @@ import {
   PlusJakartaSans_700Bold,
   PlusJakartaSans_800ExtraBold,
   useFonts,
-} from '@expo-google-fonts/plus-jakarta-sans';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+} from "@expo-google-fonts/plus-jakarta-sans";
+import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
 
-import { colors } from '@/lib/theme';
+import { UpdateBanner } from "@/components/update-banner";
+import { colors } from "@/lib/theme";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -30,18 +31,29 @@ export default function RootLayout() {
   if (!loaded && !error) return null;
 
   return (
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.cream2 } }}>
-      <Stack.Screen name="kiosk" options={{ gestureEnabled: false, animation: 'fade' }} />
-      <Stack.Screen
-        name="settings"
-        options={{
-          headerShown: true,
-          title: 'Réglages',
-          presentation: 'modal',
-          headerStyle: { backgroundColor: colors.cream2 },
-          headerTintColor: colors.ink,
+    <>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.cream2 },
         }}
-      />
-    </Stack>
+      >
+        <Stack.Screen
+          name="kiosk"
+          options={{ gestureEnabled: false, animation: "fade" }}
+        />
+        <Stack.Screen
+          name="settings"
+          options={{
+            headerShown: true,
+            title: "Réglages",
+            presentation: "modal",
+            headerStyle: { backgroundColor: colors.cream2 },
+            headerTintColor: colors.ink,
+          }}
+        />
+      </Stack>
+      <UpdateBanner />
+    </>
   );
 }
