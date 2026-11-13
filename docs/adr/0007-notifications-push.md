@@ -1,6 +1,6 @@
 # ADR 0007 — Notifications push
 
-- Statut : accepté (configuration Firebase en attente)
+- Statut : accepté
 - Date : 2026-11-13
 
 ## Contexte
@@ -18,5 +18,6 @@ Le sujet exige des notifications push déclenchées par les règles. Théo veut 
 ## Conséquences
 
 - **Android uniquement** pour l'instant : sur iPhone, il faut un compte Apple Developer payant.
-- **À faire par Théo** : projet Firebase avec l'app Android `fr.manora.live`, fichier `google-services.json` à la racine de l'app (référencé par `android.googleServicesFile` dans `app.json`), clé de compte de service FCM v1 chargée dans EAS (`eas credentials`). Sans cela, l'inscription échoue en silence (`unavailable`).
+- Firebase : projet `manora-live`, app Android `fr.manora.live`. `google-services.json` n'est pas dans le dépôt (clé d'API Google, refusée par gitleaks) : il est lu en local à la racine de l'app, et fourni aux builds EAS par la variable d'environnement de type fichier `GOOGLE_SERVICES_JSON` (`app.config.js`).
+- La clé de compte de service FCM v1 doit être chargée dans EAS (`eas credentials` → Android → Push Notifications FCM V1) pour qu'Expo puisse envoyer. Sans elle, ou sans Firebase dans le build, l'inscription échoue en silence (`unavailable`).
 - `expo-notifications` est un module natif : un nouvel APK est nécessaire. Pas de push dans Expo Go sur Android.

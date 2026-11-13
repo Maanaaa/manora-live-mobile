@@ -42,3 +42,6 @@ example
 /ios
 /android
 .env
+
+# Firebase (notifications push) : fourni à EAS par la variable de type fichier GOOGLE_SERVICES_JSON
+google-services.json
